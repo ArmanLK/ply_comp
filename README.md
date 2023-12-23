@@ -3,7 +3,7 @@
 run the program with this commands <br>
 ## Phase 1
 ```bash
-python lex.py input_file output_file
+python lexer.py input_file output_file
 ```
 ## Phase 2
 ```bash
