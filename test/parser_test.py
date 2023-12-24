@@ -33,7 +33,7 @@ class ParserTest(TestCase):
 
     def test2(self):
         test_input = """program prg2;
-        funtion avg(integer m; integer n):real
+        function avg(integer m; integer n):real
         integer sum, num;
         real average;
         begin

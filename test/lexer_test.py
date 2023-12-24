@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from lexer import my_lexer
+from lexer import my_lexer, tokenizer
 
 
 class LexerTest(TestCase):
@@ -110,17 +110,13 @@ class LexerTest(TestCase):
             ("SEMICOLON", ";"),
         ]
         it = iter(output)
-
-        while True:
-            token = my_lexer.token()
-            if not token:
-                break
+        for tok in tokenizer(my_lexer):
             right_token = next(it)
-            self.assertEqual(right_token, (token.type, token.value))
+            self.assertEqual(right_token, (tok.type, tok.value))
 
     def test2(self):
         test_input: str = """program prg2;
-        funtion avg(integer m; integer n):real
+        function avg(integer m; integer n):real
         integer sum, num;
         real average;
         begin
@@ -139,7 +135,7 @@ class LexerTest(TestCase):
             ("PROGRAM_KW", "program"),
             ("IDENTIFIER", "prg2"),
             ("SEMICOLON", ";"),
-            ("FUNTION_KW", "funtion"),
+            ("FUNCTION_KW", "function"),
             ("IDENTIFIER", "avg"),
             ("LEFT_PA", "("),
             ("INTEGER_KW", "integer"),
@@ -213,9 +209,6 @@ class LexerTest(TestCase):
 
         it = iter(output)
 
-        while True:
-            token = my_lexer.token()
-            if not token:
-                break
+        for tok in tokenizer(my_lexer):
             right_token = next(it)
-            self.assertEqual(right_token, (token.type, token.value))
+            self.assertEqual(right_token, (tok.type, tok.value))

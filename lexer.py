@@ -4,7 +4,7 @@ from ply import lex
 
 keywords = {
     "program": "PROGRAM_KW",
-    "funtion": "FUNTION_KW",
+    "function": "FUNCTION_KW",
     "begin": "BEGIN_KW",
     "end": "END_KW",
     "while": "WHILE_KW",
@@ -48,7 +48,7 @@ tokens = tuple(keywords.values()) + (
 # rules
 t_ignore = "\t \n"
 t_PROGRAM_KW = r"program"
-t_FUNTION_KW = r"function"
+t_FUNCTION_KW = r"function"
 t_BEGIN_KW = r"begin"
 t_END_KW = r"end"
 t_WHILE_KW = r"while"
@@ -98,6 +98,14 @@ def t_error(tok):
     tok.lexer.skip(1)
 
 
+def tokenizer(lexer):
+    while True:
+        tok = lexer.token()
+        if not tok:
+            return
+        yield tok
+
+
 my_lexer = lex.lex()
 
 if __name__ == "__main__":
@@ -130,10 +138,7 @@ if __name__ == "__main__":
     my_lexer.input(input_txt)
     last = 1
 
-    while True:
-        tok = my_lexer.token()
-        if not tok:
-            break
+    for tok in tokenizer(my_lexer):
         if tok.type in ["IDENTIFIER", "NUMBER"]:
             if tok.value not in table:
                 table[tok.value] = last
