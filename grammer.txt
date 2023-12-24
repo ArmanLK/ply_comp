@@ -21,11 +21,12 @@ expr -> expr and expr
      | expr * expr
      | expr / expr
      | expr + expr
-     | expr * expr
+     | expr - expr
      | expr relop expr
      | (expr)
      | integerNumber
      | realNumber
+     | id
      | true
      | false
 relop -> < | <= | = | <> | >= | >

@@ -1,5 +1,3 @@
-from sys import argv, stderr, stdout
-
 from ply import lex
 
 keywords = {
@@ -109,6 +107,8 @@ def tokenizer(lexer):
 my_lexer = lex.lex()
 
 if __name__ == "__main__":
+    from sys import argv, stderr, stdout
+
     argc = len(argv)
     table = {}
 
