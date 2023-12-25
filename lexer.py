@@ -44,7 +44,7 @@ tokens = tuple(keywords.values()) + (
 )
 
 # rules
-t_ignore = "\t \n"
+t_ignore = "\t "
 t_PROGRAM_KW = r"program"
 t_FUNCTION_KW = r"function"
 t_BEGIN_KW = r"begin"
@@ -86,6 +86,11 @@ table: dict[str, int] = {}  # gotta change it for symbol table.
 last = 1
 
 
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+
 def t_IDENTIFIER(tok):
     r"[a-zA-Z_][a-zA-Z_0-9]*"
     tok.type = keywords.get(tok.value, "IDENTIFIER")
@@ -94,14 +99,6 @@ def t_IDENTIFIER(tok):
 
 def t_error(tok):
     tok.lexer.skip(1)
-
-
-def tokenizer(lexer):
-    while True:
-        tok = lexer.token()
-        if not tok:
-            return
-        yield tok
 
 
 my_lexer = lex.lex()
@@ -138,9 +135,10 @@ if __name__ == "__main__":
     my_lexer.input(input_txt)
     last = 1
 
-    for tok in tokenizer(my_lexer):
+    for tok in my_lexer:
         if tok.type in ["IDENTIFIER", "NUMBER"]:
             if tok.value not in table:
                 table[tok.value] = last
                 last += 1
-        print(f"{tok.value}\t<{tok.type},{table.get(tok.value,'-')}>", file=out)
+        print(f"{tok.value}\t<{tok.type},{table.get(tok.value,'-')}>",
+              file=out)

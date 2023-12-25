@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from lexer import my_lexer, tokenizer
+from lexer import my_lexer
 
 
 class LexerTest(TestCase):
@@ -110,7 +110,7 @@ class LexerTest(TestCase):
             ("SEMICOLON", ";"),
         ]
         it = iter(output)
-        for tok in tokenizer(my_lexer):
+        for tok in my_lexer:
             right_token = next(it)
             self.assertEqual(right_token, (tok.type, tok.value))
 
@@ -209,6 +209,6 @@ class LexerTest(TestCase):
 
         it = iter(output)
 
-        for tok in tokenizer(my_lexer):
+        for tok in my_lexer:
             right_token = next(it)
             self.assertEqual(right_token, (tok.type, tok.value))
