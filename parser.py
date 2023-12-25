@@ -1,4 +1,4 @@
-from sys import stderr
+from sys import argv, stderr
 
 from lexer import my_lexer, tokens  # noqa: F401
 from ply import yacc
@@ -81,26 +81,26 @@ def p_parameters(p):
 
 def p_block(p):
     """
-    block : BEGIN_KW stmtList SEMICOLON END_KW
+    block : BEGIN_KW stmtList END_KW SEMICOLON
     """
     _ = p
 
 
 def p_stmtList(p):
     """
-    stmtList : stmt SEMICOLON
-             | stmtList stmt SEMICOLON
+    stmtList : stmt
+             | stmtList stmt
     """
     _ = p
 
 
 def p_stmt(p):
     """
-    stmt : IDENTIFIER ASSIGN_OP expr
+    stmt : IDENTIFIER ASSIGN_OP expr SEMICOLON
          | IF_KW expr THEN_KW stmt matchedStmt
          | WHILE_KW expr DO_KW stmt
          | FOR_KW IDENTIFIER ASSIGN_OP expr TO_KW expr DO_KW stmt
-         | RETURN_KW expr
+         | RETURN_KW expr SEMICOLON
          | expr
          | block
     """
@@ -161,29 +161,12 @@ def p_error(p):
 
 
 # method: 'SLR', 'LALR'
-parser = yacc.yacc()
+parser = yacc.yacc(method="SLR")
 
 if __name__ == "__main__":
+    input_txt = open(argv[1]).read()
     parser.parse(
-        """program prg1;
-        integer num,divisor,quotient;
-        begin
-        num:=61;
-        divisor:=2;
-        quotient:=0;
-        if num=1 then
-        return false;
-        else if num = 2 then
-        return true;
-        while divisor<=(num/2) do
-        begin
-        quotient:=num/divisor;
-        if divisor * quotient=num then
-        return false;
-        divisor:=divisor+1;
-        end;
-        return true;
-        end;""",
+        input=input_txt,
         debug=True,
         lexer=my_lexer,
     )

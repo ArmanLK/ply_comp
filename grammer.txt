@@ -6,7 +6,7 @@ varList -> id | varList, id
 funcList -> funcList funcDec | e
 funcDec -> function id parameters : type decList block;
 parameters -> (decList)
-block -> begin stmtList; end
+block -> begin stmtList end;
 stmtList -> stmt; | stmtList stmt;
 stmt -> id := expr
      | if expr then stmt
