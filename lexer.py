@@ -87,7 +87,7 @@ last = 1
 
 
 def t_newline(t):
-    r'\n+'
+    r"\n+"
     t.lexer.lineno += len(t.value)
 
 
@@ -140,5 +140,4 @@ if __name__ == "__main__":
             if tok.value not in table:
                 table[tok.value] = last
                 last += 1
-        print(f"{tok.value}\t<{tok.type},{table.get(tok.value,'-')}>",
-              file=out)
+        print(f"{tok.value}\t<{tok.type},{table.get(tok.value,'-')}>", file=out)
