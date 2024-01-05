@@ -179,11 +179,13 @@ if __name__ == "__main__":
 
     try:
         out_file = open(argv[2])
-    except OSError:
+    except IndexError:
         out_file = stdout
 
     try:
-        input_txt = open(argv[1]).read()
+        input_file = open(argv[1])
+        input_txt = input_file.read()
+        input_file.close()
     except Exception as e:
         print(e, stderr)
         exit()
@@ -198,3 +200,5 @@ if __name__ == "__main__":
         print(e.lineno, file=stderr)
     finally:
         print(*__productions, sep="\n", file=out_file)
+
+    out_file.close()
