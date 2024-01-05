@@ -101,7 +101,7 @@ def t_error(tok):
     tok.lexer.skip(1)
 
 
-my_lexer = lex.lex()
+LEXER = lex.lex()
 
 if __name__ == "__main__":
     from sys import argv, stderr, stdout
@@ -132,10 +132,10 @@ if __name__ == "__main__":
         exit(-1)
 
     input_txt = input_file.read()
-    my_lexer.input(input_txt)
+    LEXER.input(input_txt)
     last = 1
 
-    for tok in my_lexer:
+    for tok in LEXER:
         if tok.type in ["IDENTIFIER", "NUMBER"]:
             if tok.value not in table:
                 table[tok.value] = last
