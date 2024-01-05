@@ -1,4 +1,7 @@
 from unittest import TestCase, main
+from lexer import LEXER
+
+from parser import PARSER
 
 
 class ParserTest(TestCase):
@@ -24,12 +27,8 @@ class ParserTest(TestCase):
         return true;
         end;
         """
-        _ = test_input
-        output = []  # list of productions
-        _ = output
-        it = iter(output)
-        _ = it
         # TODO: do the check
+        PARSER.parse(test_input, LEXER)
 
     def test2(self):
         test_input = """program prg2;
@@ -47,7 +46,7 @@ class ParserTest(TestCase):
         begin
         a:=avg(1,20);
         end;"""
-        _ = test_input
+        PARSER.parse(test_input, LEXER)
 
     def test_syntax_error_not_EOF(self):
         test_input = """program badTest;
@@ -57,7 +56,7 @@ class ParserTest(TestCase):
         return true;
         end;
         """
-        _ = test_input
+        PARSER.parse(test_input, LEXER)
 
     def test_syntax_error_EOF(self):  # TODO: this is probably not correct.
         test_input = """program badTestEOF;
@@ -65,10 +64,7 @@ class ParserTest(TestCase):
         begin
         return 1 + 2 - 4 * 100;
         end"""
-        _ = test_input
-
-    def test_all_states(self):  # DON'T DO THIS!!!
-        pass
+        PARSER.parse(test_input, LEXER)
 
 
 if __name__ == "__main__":

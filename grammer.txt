@@ -1,34 +1,28 @@
-start → program id; decList funcList block
+start → program id ; decList funcList block
 decList → decs | decList decs
-decs → type varList; | ε
-type → integer | real | boolean
-varList → id | varList, id
+decs → type varList ; | ε
+typea → integer | real | boolean
+varList → id | varList , id
 funcList → funcList funcDec | ε
 funcDec → function id parameters : type decList block
 parameters → (decList)
-block → begin stmtList end;
+block → begin stmtList end
 stmtList → stmt | stmtList stmt
-stmt → id := expr
-     | if expr then stmt
-     | if expr then stmt else stmt
-     | while expr do stmt
-     | for id:=expr to expr do stmt
-     | return expr
-     | expr
-     | block
-expr → expr and expr
-     | expr or expr
-     | expr * expr
-     | expr / expr
-     | expr + expr
-     | expr - expr
-     | expr relop expr
-     | (expr)
-     | integerNumber
-     | realNumber
-     | id (actualParamList)
-     | id
-     | true
-     | false
-actualParamList → expr | actualParamList, expr | id | ε
+stmt → id := expr ;
+    |if expr then stmt
+    |if expr then stmt else stmt
+    |while expr do stmt
+    |for id:=expr to expr do stmt
+    |return expr ;
+    |block
+expr → expr and expr | expr or expr
+    |expr ∗ expr | expr / expr
+    |expr + expr | expr − expr
+    |expr relop expr
+    |(expr)
+    |integerNumber | realNumber
+    |true | false
+    |id(actualparamlist)
+    |id
+actualparamlist → expr | actualparamlist, expr | id | ε
 relop → < | <= | = | <> | >= | >

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from lexer import my_lexer
+from lexer import LEXER
 
 
 class LexerTest(TestCase):
@@ -27,7 +27,7 @@ class LexerTest(TestCase):
         return true;
         end;
         """
-        my_lexer.input(test_input)
+        LEXER.input(test_input)
         output = [
             ("PROGRAM_KW", "program"),
             ("IDENTIFIER", "prg1"),
@@ -110,7 +110,7 @@ class LexerTest(TestCase):
             ("SEMICOLON", ";"),
         ]
         it = iter(output)
-        for tok in my_lexer:
+        for tok in LEXER:
             right_token = next(it)
             self.assertEqual(right_token, (tok.type, tok.value))
 
@@ -130,7 +130,7 @@ class LexerTest(TestCase):
         begin
         a:=avg(1,20);
         end;"""
-        my_lexer.input(test_input)
+        LEXER.input(test_input)
         output = [
             ("PROGRAM_KW", "program"),
             ("IDENTIFIER", "prg2"),
@@ -209,6 +209,6 @@ class LexerTest(TestCase):
 
         it = iter(output)
 
-        for tok in my_lexer:
+        for tok in LEXER:
             right_token = next(it)
             self.assertEqual(right_token, (tok.type, tok.value))
