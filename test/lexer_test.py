@@ -1,4 +1,5 @@
 from unittest import TestCase
+import unittest
 
 from lexer import LEXER
 
@@ -212,3 +213,6 @@ class LexerTest(TestCase):
         for tok in LEXER:
             right_token = next(it)
             self.assertEqual(right_token, (tok.type, tok.value))
+
+if __name__ == '__main__':
+    unittest.main()

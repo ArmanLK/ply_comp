@@ -1,4 +1,5 @@
 from unittest import TestCase, main
+import unittest
 from lexer import LEXER
 
 from parser import PARSER, MySyntaxError
@@ -67,4 +68,4 @@ class ParserTest(TestCase):
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()
