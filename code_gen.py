@@ -301,7 +301,6 @@ if __name__ == "__main__":
         # print(*__productions, sep="\n", file=out_file)
         pass
 
-        print(*productions, sep="\n", file=out_file)
-        pass
+    print(code, file=out_file)
 
     out_file.close()
