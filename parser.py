@@ -9,7 +9,8 @@ precedence = (
 )
 
 
-__productions = []
+productions: list[str] = []
+code: str = ""
 
 
 def __production_to_string(p: YaccProduction) -> str:
@@ -27,8 +28,8 @@ def __token_to_string(token: LexToken) -> str:
 
 
 class MySyntaxError(Exception):
-    def __init__(self, lineno, *args: object) -> None:
-        self.lineno = lineno
+    def __init__(self, p: YaccProduction | LexToken, *args: object) -> None:
+        self.p = p
         super().__init__(*args)
 
 
@@ -36,14 +37,22 @@ def p_start(p: YaccProduction):
     """
     start : PROGRAM_KW IDENTIFIER SEMICOLON decList funcList block
     """
-    __productions.append(__production_to_string(p))
+    global code
+    productions.append(__production_to_string(p))
+    p[0] = f"""#include <stdbool.h>
+{p[4]}
+{p[5]}
+int main(int argc, char** argv){p[6]}
+"""
+    code = str(p[0])
 
 
 def p_decList(p: YaccProduction):
     """
     decList : decs decListRest
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = f"// variable decralation:\n{p[1]}"
 
 
 def p_decListRest(p: YaccProduction):
@@ -51,7 +60,11 @@ def p_decListRest(p: YaccProduction):
     decListRest : decs decListRest
                 |
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 1:
+        p[0] = ""
+    else:
+        p[0] = p[1]
 
 
 def p_decs(p: YaccProduction):
@@ -59,7 +72,19 @@ def p_decs(p: YaccProduction):
     decs : type varList SEMICOLON
          |
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 1:
+        p[0] = ""
+        return
+
+    if p[1] == "real":
+        p[0] = f"float {p[2]};\n"
+    elif p[1] == "integer":
+        p[0] = f"int {p[2]}\n"
+    elif p[1] == "bool ean":
+        p[0] = f"bool {p[2]}\n"
+    else:
+        raise ValueError("WHUT??")
 
 
 def p_type(p: YaccProduction):
@@ -68,14 +93,16 @@ def p_type(p: YaccProduction):
          | REAL_KW
          | BOOLEAN_KW
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = p[1]
 
 
 def p_varList(p: YaccProduction):
     """
     varList : IDENTIFIER varListRest
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = f"{p[1]}{p[2]};"
 
 
 def p_varListRest(p: YaccProduction):
@@ -83,7 +110,11 @@ def p_varListRest(p: YaccProduction):
     varListRest : COMMA IDENTIFIER varListRest
                 |
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 1:
+        p[0] = ""
+        return
+    p[0] = f", {p[2]}{p[3]}"
 
 
 def p_funcList(p: YaccProduction):
@@ -91,21 +122,37 @@ def p_funcList(p: YaccProduction):
     funcList : FUNCTION_KW IDENTIFIER parameters COLON type decList block
              |
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 1:
+        p[0] = "// no function created\n"
+        return
+    p[0] = "// functions:\n"
+    if p[5] == "real":
+        p[5] = "float"
+    elif p[5] == "integer":
+        p[5] = "int"
+    elif p[5] == "boolean":
+        p[5] = "bool"
+    else:
+        raise ValueError("WHUT? 2")
+
+    p[0] += f"{p[5]} {p[2]}{p[3]} {p[7]}"
 
 
 def p_parameters(p: YaccProduction):
     """
     parameters : LEFT_PA decList RIGHT_PA
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = f"({p[2]})"
 
 
 def p_block(p: YaccProduction):
     """
     block : BEGIN_KW stmtList END_KW
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = f"{{\n// block start\n{p[2]}// block end\n}}"
 
 
 def p_stmtList(p: YaccProduction):
@@ -113,7 +160,11 @@ def p_stmtList(p: YaccProduction):
     stmtList : stmt
              | stmtList stmt
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = p[1] + p[2]
 
 
 def p_stmt(p: YaccProduction):
@@ -126,7 +177,22 @@ def p_stmt(p: YaccProduction):
          | expr
          | block
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    p[0] = p[1:]
+    if len(p) < 3:
+        p[0] = p[1]
+        return
+
+    if p[1] == "if":
+        p[0] = f"if ({p[2]}) {p[4]}\n"
+    elif p[1] == "while":
+        p[0] = f"while ({p[2]}) {p[4]}\n"
+    elif p[1] == "for":
+        p[0] = f"for ({p[2]}={p[4]}; {p[2]}<{p[6]}; {p[2]}++) {p[8]}\n"
+    elif p[1] == "return":
+        p[0] = f"return {p[2]};\n"
+    elif p[2] == ":=":
+        p[0] = f"{p[1]} = {p[3]};\n"
 
 
 def p_matchedStmt(p: YaccProduction):
@@ -134,7 +200,11 @@ def p_matchedStmt(p: YaccProduction):
     matchedStmt : ELSE_KW stmt
                 |
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) > 1:
+        p[0] = f"else {p[1]}\n"
+        return
+    p[0] = ""
 
 
 def p_expr(p: YaccProduction):
@@ -147,12 +217,36 @@ def p_expr(p: YaccProduction):
          | expr SUB_OP expr
          | expr relop expr
          | LEFT_PA expr RIGHT_PA
+         | IDENTIFIER LEFT_PA actualParamList RIGHT_PA
          | IDENTIFIER
          | NUMBER
          | TRUE_KW
          | FALSE_KW
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if len(p) == 5:
+        p[0] = f"{p[1]}({p[3]})"
+    elif len(p) == 4:
+        p[0] = f"{p[1]} {p[2]} {p[3]}"
+    elif len(p) == 2:
+        p[0] = f"{p[1]}"
+    else:
+        raise ValueError("WHUT? 3")
+
+def p_actualParamList(p: YaccProduction):
+    """
+    actualParamList : expr
+                    | actualParamList COMMA expr
+                    | IDENTIFIER
+                    | NUMBER
+                    |
+    """
+    if len(p) == 1:
+        p[0] = ""
+    elif len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 3:
+        p[0] = f"{p[1]}, {p[2]}"
 
 
 def p_relop(p: YaccProduction):
@@ -164,11 +258,15 @@ def p_relop(p: YaccProduction):
           | GE_OP
           | GT_OP
     """
-    __productions.append(__production_to_string(p))
+    productions.append(__production_to_string(p))
+    if p[1] == "=":
+        p[0] = "=="
+        return
+    p[0] = p[1]
 
 
-def p_error(p: LexToken | YaccProduction):
-    raise MySyntaxError(p.lineno, f"error at line {p.lineno}")
+def p_error(p: LexToken):
+    raise MySyntaxError(p, f"error at line {p.lineno}")
 
 
 # method: 'SLR', 'LALR'
@@ -197,8 +295,12 @@ if __name__ == "__main__":
             lexer=LEXER,
         )
     except MySyntaxError as e:
-        print(e.lineno, file=stderr)
+        p = e.p
+        print(p.lineno, file=stderr)
     finally:
-        print(*__productions, sep="\n", file=out_file)
+        # print(*__productions, sep="\n", file=out_file)
+        pass
+
+    print(code, file=out_file)
 
     out_file.close()
