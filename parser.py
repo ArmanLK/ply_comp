@@ -114,6 +114,7 @@ def p_stmtList(p: YaccProduction):
              | stmtList stmt
     """
     __productions.append(__production_to_string(p))
+    # print(p[:])
 
 
 def p_stmt(p: YaccProduction):
@@ -127,6 +128,7 @@ def p_stmt(p: YaccProduction):
          | block
     """
     __productions.append(__production_to_string(p))
+    # print(p[:])
 
 
 def p_matchedStmt(p: YaccProduction):
@@ -135,6 +137,7 @@ def p_matchedStmt(p: YaccProduction):
                 |
     """
     __productions.append(__production_to_string(p))
+    # print(p[:])
 
 
 def p_expr(p: YaccProduction):
@@ -153,6 +156,10 @@ def p_expr(p: YaccProduction):
          | FALSE_KW
     """
     __productions.append(__production_to_string(p))
+    if len(p) == 4:
+        p[0] = p[1] + p[2] + p[3]
+        return
+    p[0] = p[1]
 
 
 def p_relop(p: YaccProduction):
@@ -165,6 +172,7 @@ def p_relop(p: YaccProduction):
           | GT_OP
     """
     __productions.append(__production_to_string(p))
+    p[0] = p[1]
 
 
 def p_error(p: LexToken | YaccProduction):
@@ -200,5 +208,6 @@ if __name__ == "__main__":
         print(e.lineno, file=stderr)
     finally:
         print(*__productions, sep="\n", file=out_file)
+        pass
 
     out_file.close()
