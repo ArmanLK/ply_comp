@@ -1,4 +1,4 @@
-from lexer import LEXER, tokens
+from lexer import LEXER
 from ply.yacc import YaccProduction, yacc
 from ply.lex import LexToken
 
@@ -8,26 +8,11 @@ precedence = (
     ("left", "MUL_OP", "DIV_OP"),
 )
 
-
-productions: list[str] = []
 code: str = ""
 
 
-def __production_to_string(p: YaccProduction) -> str:
-    if p.slice == []:
-        return ""
-
-    s = str().join(__token_to_string(tok) for tok in p.slice[1:])
-    return f"{p.number}\t\t{p.slice[0]} -> {s}"
-
-
-def __token_to_string(token: LexToken) -> str:
-    if token.type not in tokens:
-        return f"{token.type} "
-    return f'"{token.value}" '
-
-
 class MySyntaxError(Exception):
+
     def __init__(self, p: YaccProduction | LexToken, *args: object) -> None:
         self.p = p
         super().__init__(*args)
@@ -38,7 +23,6 @@ def p_start(p: YaccProduction):
     start : PROGRAM_KW IDENTIFIER SEMICOLON decList funcList block
     """
     global code
-    productions.append(__production_to_string(p))
     p[0] = f"""#include <stdbool.h>
 {p[4]}
 {p[5]}
@@ -51,7 +35,6 @@ def p_decList(p: YaccProduction):
     """
     decList : decs decListRest
     """
-    productions.append(__production_to_string(p))
     p[0] = f"// variable decralation:\n{p[1]}"
 
 
@@ -60,7 +43,6 @@ def p_decListRest(p: YaccProduction):
     decListRest : decs decListRest
                 |
     """
-    productions.append(__production_to_string(p))
     if len(p) == 1:
         p[0] = ""
     else:
@@ -72,7 +54,6 @@ def p_decs(p: YaccProduction):
     decs : type varList SEMICOLON
          |
     """
-    productions.append(__production_to_string(p))
     if len(p) == 1:
         p[0] = ""
         return
@@ -93,7 +74,6 @@ def p_type(p: YaccProduction):
          | REAL_KW
          | BOOLEAN_KW
     """
-    productions.append(__production_to_string(p))
     p[0] = p[1]
 
 
@@ -101,7 +81,6 @@ def p_varList(p: YaccProduction):
     """
     varList : IDENTIFIER varListRest
     """
-    productions.append(__production_to_string(p))
     p[0] = f"{p[1]}{p[2]};"
 
 
@@ -110,7 +89,6 @@ def p_varListRest(p: YaccProduction):
     varListRest : COMMA IDENTIFIER varListRest
                 |
     """
-    productions.append(__production_to_string(p))
     if len(p) == 1:
         p[0] = ""
         return
@@ -122,7 +100,6 @@ def p_funcList(p: YaccProduction):
     funcList : FUNCTION_KW IDENTIFIER parameters COLON type decList block
              |
     """
-    productions.append(__production_to_string(p))
     if len(p) == 1:
         p[0] = "// no function created\n"
         return
@@ -143,7 +120,6 @@ def p_parameters(p: YaccProduction):
     """
     parameters : LEFT_PA decList RIGHT_PA
     """
-    productions.append(__production_to_string(p))
     p[0] = f"({p[2]})"
 
 
@@ -151,7 +127,6 @@ def p_block(p: YaccProduction):
     """
     block : BEGIN_KW stmtList END_KW
     """
-    productions.append(__production_to_string(p))
     p[0] = f"{{\n// block start\n{p[2]}// block end\n}}"
 
 
@@ -160,7 +135,6 @@ def p_stmtList(p: YaccProduction):
     stmtList : stmt
              | stmtList stmt
     """
-    productions.append(__production_to_string(p))
     if len(p) == 2:
         p[0] = p[1]
     else:
@@ -177,7 +151,6 @@ def p_stmt(p: YaccProduction):
          | expr
          | block
     """
-    productions.append(__production_to_string(p))
     p[0] = p[1:]
     if len(p) < 3:
         p[0] = p[1]
@@ -200,7 +173,6 @@ def p_matchedStmt(p: YaccProduction):
     matchedStmt : ELSE_KW stmt
                 |
     """
-    productions.append(__production_to_string(p))
     if len(p) > 1:
         p[0] = f"else {p[1]}\n"
         return
@@ -223,7 +195,6 @@ def p_expr(p: YaccProduction):
          | TRUE_KW
          | FALSE_KW
     """
-    productions.append(__production_to_string(p))
     if len(p) == 5:
         p[0] = f"{p[1]}({p[3]})"
     elif len(p) == 4:
@@ -232,6 +203,7 @@ def p_expr(p: YaccProduction):
         p[0] = f"{p[1]}"
     else:
         raise ValueError("WHUT? 3")
+
 
 def p_actualParamList(p: YaccProduction):
     """
@@ -258,7 +230,6 @@ def p_relop(p: YaccProduction):
           | GE_OP
           | GT_OP
     """
-    productions.append(__production_to_string(p))
     if p[1] == "=":
         p[0] = "=="
         return
